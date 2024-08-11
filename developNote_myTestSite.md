@@ -251,4 +251,18 @@ export default function SideNav(props) {
 遇到了与上传图片相同的问题，本地的笔记无法在 GitHub page 中获得，尝试通过 GitHub 链接进行抓取，但是需要 token，且临时 token 具有时效性。
 
 尝试生成 token：'\*\*\*' 失败，
-尝试将 note 上传至图床库进行尝试
+尝试将 note 上传至图床库进行尝试 **成功显示**。
+
+## 2024/8/11
+
+实现了 note 的显示和标签切换，通过 json 存储 note 信息和地址，在 notelist 中渲染所有 notes 列表，通过选中 note 切换至 markdownComponent 组件，实现方法为在 Note 组件中添加 activate 和 url 状态，将 setactivate 传递到 NoteList 和 MarkdownComponent 组件通过
+
+```js
+return(
+  {activate?(<NoteList/>):(<MarkdownComponent>)}
+)
+```
+
+进行组件切换。
+
+增加了 MarkdownComponent 的显示边框效果。
