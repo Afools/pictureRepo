@@ -42,8 +42,9 @@ B+ 树是在 B 树基础上的一种优化，使其更适合实现外存储索�
 每个结点都包含 k 个元素（关键字），这里 `m/2≤k<m`，这里 `m/2` 向下取整；
 每个节点中的元素（关键字）从小到大排列；
 每个元素子左结点的值，都小于或等于该元素，右结点的值都大于或等于该元素。
-数据库以 B-Tree 的数据结构存储数据的图示如下：
+数据库以 B-Tree 的数据结构存储数据的图示如下：  
 ![](https://raw.githubusercontent.com/Afools/pictureRepo/main/B-tree-struct.png)
+
 B+ Tree 与 B-Tree 的结构很像，但是也有自己的特性：
 
 所有的非叶子结点只存储 关键字信息；
@@ -138,7 +139,7 @@ MySQL 里只有 INNODB 表支持聚簇索引，INNODB 表数据本身就是聚�
 
 除了聚簇索引以外的其他索引，均称之为非聚簇索引。非聚簇索引也是 B 树结构，与聚簇索引的存储结构不同之处在于，非聚簇索引中不存储真正的数据行，只包含一个指向数据行的指针。
 
-就简单的 SQL 查询来看，分为 SELECT 和 WHERE 两个部分，索引的创建也是以此为根据的，分为**复合索引**和**覆盖索引**。
+就简单的 SQL 查询来看，分为 SELECT 和 WHERE 两个部分，索引的创建也是以此为根据的，分为**复合索引**和**覆盖索引**。  
 ![](https://raw.githubusercontent.com/Afools/pictureRepo/main/clustered_index.png)
 
 ## 事务管理
