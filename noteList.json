@@ -49,8 +49,16 @@
                     "Data Structure"
                 ],
                 "date":"2024-7-26",
-                "url":"https://raw.githubusercontent.com/Afools/pictureRepo/main/DataBase.md"
+                "url":"https://raw.githubusercontent.com/Afools/pictureRepo/main/DataBase/DataBase.md"
             }
         ]
+    },
+    {
+        "noteBook":"Data Visualization",
+        "eventKey":3,
+        "notes":[
+            {}
+        ]
+        
     }
 ]

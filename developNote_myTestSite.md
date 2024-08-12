@@ -282,3 +282,6 @@ return(
 
 - 发现实际渲染内容超出屏幕大小，浏览器右侧和下方出现滑条，尝试改进。  
   main-section 添加样式`width:auto !important`解决相关问题。发现因为 BOOTSTRAP 中 Container 自带`width:100%`，此样式会使组件宽超出屏幕。但 percentage 应该是根据上级组件容纳宽度的大小进行百分比分配，而 main-section 上级为 APP，不应该出现此类现象，具体原因需要进一步学习分析。
+
+- 尝试使用 marked 对 markdown 渲染进行优化，增加代码高亮和表格渲染。使用 marked 和 highlight.js 进行渲染。  
+  出现 pre code 代码块类名错误，错误：`language-html`正确：`hljs language-html`且手动修改后仍未出现相应的代码渲染样式。需要继续学习、实验
