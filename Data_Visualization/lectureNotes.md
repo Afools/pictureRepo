@@ -12,4 +12,31 @@
 ### Background
 
 - Information Explosion
--
+- Classification of Visualization
+
+  - Data visualization
+    - Scientific Visualization: Often scalar or vector fields from computer simulations.
+    - Information Visualization: Abstract data (e.g., has no inherent physical form)
+    - Software Visualization
+
+- Sequence of Steps
+  - data acquisition: conversion, formatting, cleaning
+  - data enrichment: transformation, resampling, filtering
+  - data mapping
+  - rendering
+
+### Syllabus
+
+- Value of data visualization
+- Data representation
+- Visual encoding
+- Visualization tools
+- Basic plots and charts
+- Visual perception
+- Visualization design
+- Interactive visualization
+- Exploratory data analysis (correlation analysis)
+- Exploratory data analysis (time series analysis)
+- Geospatial visualization
+- Abstract data visualization
+- Scientific data visualization
