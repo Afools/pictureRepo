@@ -1,7 +1,7 @@
 [
     {
         "noteBook":"Web",
-        "eventkey":1,
+        "eventKey":1,
         "notes":[
             {
                 "title": "React and Bootstrap personal website",
@@ -20,7 +20,7 @@
     },
     {
         "noteBook":"Blockchain",
-        "eventkey":2,
+        "eventKey":2,
         "notes":[
             {
                 "title":"FDL Attack&Defense Strategy",
