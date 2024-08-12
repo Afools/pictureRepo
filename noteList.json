@@ -57,8 +57,12 @@
         "noteBook":"Data Visualization",
         "eventKey":3,
         "notes":[
-            {}
+            {
+                "title":"Lecture Note",
+                "description":"Note in Lecture of Data Visualization",
+                "data":"2024-8-12",
+                "url":"https://raw.githubusercontent.com/Afools/pictureRepo/main/Data Visualization/lectureNote.md"
+            }
         ]
-        
     }
 ]
