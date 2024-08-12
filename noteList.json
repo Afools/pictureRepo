@@ -35,5 +35,22 @@
                 "url":"https://raw.githubusercontent.com/Afools/pictureRepo/main/FDL_Att&Def_Strategies.md"
             }
         ]
+    },
+    {
+        "noteBook":"Data Base",
+        "eventKey":2,
+        "notes":[
+            {
+                "title":"SQL database",
+                "description":"Notes about SQL database",
+                "tags":[
+                    "SQL",
+                    "Database",
+                    "Data Structure"
+                ],
+                "date":"2024-7-26",
+                "url":"https://raw.githubusercontent.com/Afools/pictureRepo/main/DataBase.md"
+            }
+        ]
     }
 ]
