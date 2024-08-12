@@ -266,3 +266,19 @@ return(
 进行组件切换。
 
 增加了 MarkdownComponent 的显示边框效果。
+
+## 2024/8/12
+
+今日目标：
+
+- 修改 Note 界面的 side Nav，现在的 Nav 分类不符合需求，改成“笔记本-笔记”检索中*笔记本*栏会更便于检索。设想通过修改 notes.json 文件自动生成相应 side Nav 内容。  
+  通过在 Note.js 中 fetch 得到 json 数据，将数据传递到 SideNav 和 NoteList 中，SideNav 通过 OnClick()触发 setEventKey 来选择 NoteBook，eventKey 传递到 NoteList 中渲染相应 notes。
+
+- 修改 side Nav 样式，使其跟随页面滚动。  
+  尝试通过`position:fixed`样式进行固定，初步完成。修改了 nav-link 样式，鼠标悬停时会有悬浮放大效果并产生阴影。
+
+- 发现 top Nav 在不同分辨率的显示器上的效果不一，尝试修改样式，使 Nav 和搜索框分别位于屏幕左右相对固定位置。  
+  在宽很大的屏幕上渲染时，NavBar 右侧会有一块不属于 margin 或 padding 的空白，暂时未找到解决方法需要进一步学习。
+
+- 发现实际渲染内容超出屏幕大小，浏览器右侧和下方出现滑条，尝试改进。  
+  main-section 添加样式`width:auto !important`解决相关问题。发现因为 BOOTSTRAP 中 Container 自带`width:100%`，此样式会使组件宽超出屏幕。但 percentage 应该是根据上级组件容纳宽度的大小进行百分比分配，而 main-section 上级为 APP，不应该出现此类现象，具体原因需要进一步学习分析。
