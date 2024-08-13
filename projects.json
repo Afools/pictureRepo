@@ -1,0 +1,16 @@
+[
+    {
+        "id":0,
+        "href":"https://github.com/Afools/Embolus-detection",
+        "imgSrc":"https://raw.githubusercontent.com/Afools/pictureRepo/main/cancer_detection.png",
+        "cardTitle":"癌栓检测",
+        "cardText":"该项目使用retinaNet对病理切片进行检测，mAP@0.5达到80.3%"
+    },
+    {
+        "id":1,
+        "href":"http://github.com/Afools/myTestSite",
+        "imgSrc":"https://raw.githubusercontent.com/Afools/pictureRepo/main/myTestSite.png",
+        "cardTitle":"个人网站",
+        "cardText":"使用React搭建的纯前端个人网站，通过Github库管理笔记"
+    }
+]
