@@ -12,5 +12,19 @@
         "imgSrc":"https://raw.githubusercontent.com/Afools/pictureRepo/main/myTestSite.png",
         "cardTitle":"个人网站",
         "cardText":"使用React搭建的纯前端个人网站，通过Github库管理笔记"
+    },
+    {
+        "id":2,
+        "href":"https://gitee.com/q2263945042/musical-chord",
+        "imgSrc":"https://raw.githubusercontent.com/Afools/pictureRepo/main/image.png",
+        "cardTitle":"和弦生成",
+        "cardText":"使用BLSTM模型根据输入的旋律生成相应的和弦"
+    },
+    {
+        "id":3,
+        "href":"https://gitee.com/q2263945042/XJTU_summer_intern_backend",
+        "imgSrc":"https://raw.githubusercontent.com/Afools/pictureRepo/main/image.png",
+        "cardTitle":"西交暑期实习项目：三国杀",
+        "cardText":"使用SpringBoot搭建的三国杀后端，实现了基本的游戏逻辑，包括注册，登录，匹配，加入房间，游戏进行等功能"
     }
 ]
