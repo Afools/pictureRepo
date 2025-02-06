@@ -288,11 +288,13 @@ return(
 
 ## 2025/2/6
 
+### 项目进展
+
 - 完善侧边栏\
   使用`position:sticky; top:var(--navbar-height);`样式使 Note 页面的侧边栏在浏览 Note 时固定，在滚动到页面底部时和其他组件一齐滚动以显示 Footer。
 - 实现动态生成 Side Nav 内容\
   根据 fetch 的 json 文件生成 SideNav 内容。json 文件存储在公开 github 库中
-- 修改 Top Nav 更符合正常顶部导航栏样式\
+- 修改 Top Nav 更符合正常顶部导航栏样式
 
 ```css
 .navbar {
@@ -311,7 +313,7 @@ return(
 }
 ```
 
-- 删去了无用的搜索框，增加了 currPage 作为 Hook 实现当前页面在导航栏上加粗字体并改变字体颜色。\
+- 删去了无用的搜索框，增加了 currPage 作为 Hook 实现当前页面在导航栏和侧边栏上加粗字体并改变字体颜色。
 
 ```js
 <Nav.Link
@@ -326,4 +328,9 @@ return(
 
 - 调整了页面布局方式，放弃了使用 Row 和 Col，使用 CSS 进行页面调整。
 
-- 实现了 Markdown 渲染
+- 实现了 Markdown 渲染 [组件代码](https://github.com/Afools/myTestSite/blob/main/src/components/utils/MarkdownComponent.js)\
+  此渲染方式对表格渲染仍有不足，无法实现类 GitHub 渲染效果。
+
+### 代办
+
+- 调整侧边栏，在小尺寸屏幕中侧边栏隐藏。
