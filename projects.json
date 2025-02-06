@@ -8,7 +8,7 @@
     },
     {
         "id":1,
-        "href":"http://github.com/Afools/myTestSite",
+        "href":"http://github.com/Afools/myNoteViewer",
         "imgSrc":"https://raw.githubusercontent.com/Afools/pictureRepo/main/myTestSite.png",
         "cardTitle":"个人网站",
         "cardText":"使用React搭建的纯前端个人网站，通过Github库管理笔记"
