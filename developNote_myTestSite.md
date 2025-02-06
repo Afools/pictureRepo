@@ -295,6 +295,7 @@ return(
 - 实现动态生成 Side Nav 内容\
   根据 fetch 的 json 文件生成 SideNav 内容。json 文件存储在公开 github 库中
 - 修改 Top Nav 更符合正常顶部导航栏样式
+- 删去一些组件使页面简洁
 
 ```css
 .navbar {
@@ -328,7 +329,7 @@ return(
 
 - 调整了页面布局方式，放弃了使用 Row 和 Col，使用 CSS 进行页面调整。
 
-- 实现了 Markdown 渲染 [组件代码](https://github.com/Afools/myTestSite/blob/main/src/components/utils/MarkdownComponent.js)\
+- 实现了 Markdown 渲染 [组件代码](https://github.com/Afools/myTestSite/blob/main/src/components/utils/MarkdownComponent.js)
 
 ### 代办
 
