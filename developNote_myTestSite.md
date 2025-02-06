@@ -251,7 +251,7 @@ export default function SideNav(props) {
 遇到了与上传图片相同的问题，本地的笔记无法在 GitHub page 中获得，尝试通过 GitHub 链接进行抓取，但是需要 token，且临时 token 具有时效性。
 
 尝试生成 token：'\*\*\*' 失败，
-尝试将 note 上传至图床库进行尝试 **成功显示**。
+尝试将 note 上传至公开图床库进行尝试 **成功显示**。
 
 ## 2024/8/11
 
@@ -329,8 +329,36 @@ return(
 - 调整了页面布局方式，放弃了使用 Row 和 Col，使用 CSS 进行页面调整。
 
 - 实现了 Markdown 渲染 [组件代码](https://github.com/Afools/myTestSite/blob/main/src/components/utils/MarkdownComponent.js)\
-  此渲染方式对表格渲染仍有不足，无法实现类 GitHub 渲染效果。
 
 ### 代办
 
+- 解决 markdown 公式无法正常渲染的问题。 已解决\
+  使用 MarkDown 组件和 react-syntac-highlighter 组件进行渲染，使用 remark-math 和 rehype-katex 渲染公式, remark-gfm 渲染表格，参考了[React-Markdown 官方 GitHub](https://github.com/remarkjs/react-markdown?tab=readme-ov-file#use)\
+  通过自定义 css 修改表格渲染效果。
+
+  ```css
+  .markdown-body table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 16px;
+    text-align: left;
+  }
+  .markdown-body th,
+  .markdown-body td {
+    padding: 12px 15px;
+    border: 2px solid #000; /* 修改表格线的颜色和宽度 */
+  }
+
+  .markdown-body th {
+    background-color: #f4f4f4; /* 表头背景颜色 */
+    font-weight: bold;
+  }
+
+  .markdown-body tr:nth-child(even) {
+    background-color: #f9f9f9; /* 偶数行背景颜色 */
+  }
+  ```
+
 - 调整侧边栏，在小尺寸屏幕中侧边栏隐藏。
+- 考虑将网页软件化，进行自动化笔记部署
