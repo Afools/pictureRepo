@@ -269,7 +269,7 @@ return(
 
 ## 2024/8/12
 
-今日目标：
+代办：
 
 - 修改 Note 界面的 side Nav，现在的 Nav 分类不符合需求，改成“笔记本-笔记”检索中*笔记本*栏会更便于检索。设想通过修改 notes.json 文件自动生成相应 side Nav 内容。  
   通过在 Note.js 中 fetch 得到 json 数据，将数据传递到 SideNav 和 NoteList 中，SideNav 通过 OnClick()触发 setEventKey 来选择 NoteBook，eventKey 传递到 NoteList 中渲染相应 notes。
@@ -285,3 +285,45 @@ return(
 
 - 尝试使用 marked 对 markdown 渲染进行优化，增加代码高亮和表格渲染。使用 marked 和 highlight.js 进行渲染。  
   出现 pre code 代码块类名错误，错误：`language-html`正确：`hljs language-html`且手动修改后仍未出现相应的代码渲染样式。需要继续学习、实验
+
+## 2025/2/6
+
+- 完善侧边栏\
+  使用`position:sticky; top:var(--navbar-height);`样式使 Note 页面的侧边栏在浏览 Note 时固定，在滚动到页面底部时和其他组件一齐滚动以显示 Footer。
+- 实现动态生成 Side Nav 内容\
+  根据 fetch 的 json 文件生成 SideNav 内容。json 文件存储在公开 github 库中
+- 修改 Top Nav 更符合正常顶部导航栏样式\
+
+```css
+.navbar {
+  top: 0 !important;
+  background-color: #c5c5c5 !important;
+  width: 100vw !important;
+  color: #ffff !important;
+  position: sticky !important;
+  height: var(--navbar-height) !important;
+  z-index: 1000 !important;
+}
+
+.navbar-container {
+  margin-left: 5vw !important;
+  margin-right: 5vw !important;
+}
+```
+
+- 删去了无用的搜索框，增加了 currPage 作为 Hook 实现当前页面在导航栏上加粗字体并改变字体颜色。\
+
+```js
+<Nav.Link
+  as={Link}
+  to="/myTestSite/"
+  className={props.currPage === "Home" ? "currPage" : ""}
+  onClick={() => props.setCurrPage("Home")}
+>
+  Home
+</Nav.Link>
+```
+
+- 调整了页面布局方式，放弃了使用 Row 和 Col，使用 CSS 进行页面调整。
+
+- 实现了 Markdown 渲染

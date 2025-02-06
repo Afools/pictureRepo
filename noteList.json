@@ -64,5 +64,29 @@
                 "url":"https://raw.githubusercontent.com/Afools/pictureRepo/main/Data_Visualization/lectureNotes.md"
             }
         ]
+    },
+    {
+        "noteBook":"Machine Learning",
+        "eventKey":4,
+        "notes":[
+            {
+                "title":"Research Note",
+                "description":"Note for Machine Learning",
+                "data":"2025-1-25",
+                "url":"https://raw.githubusercontent.com/Afools/pictureRepo/main/Machine_Learning/lectureNotes.md"
+            }
+        ]
+    },
+    {
+        "noteBook":"Deep Learning",
+        "eventKey":5,
+        "notes":[
+            {
+                "title":"Research Note",
+                "description":"Note for Deep Learning",
+                "data":"2025-2-15",
+                "url":"https://raw.githubusercontent.com/Afools/pictureRepo/main/Deep_Learning/DL.md"
+            }
+        ]
     }
 ]
