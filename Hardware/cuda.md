@@ -55,7 +55,59 @@ cudaError_t cudaMemcpy(void* dst, const void *src, size_t count, cudaMemcpyKind 
 在核函数启动后下一条指令就是从设备复制数据到主机，那么主机必须等待设备就绪。
 
 ----------  
-可以使用`__syncthread();`函数对同一个块内的线程进行同步，线程会同时停止在某个设定的位置。这个函数只能同步同一个块内的线程，不能同步不同块内的线程，想要同步不同块内的线程，就只能让核函数执行完成，控制程序交换主机，这种方式来同步所有线程。
+1. **块内线程障碍：**  
+
+`__syncthreads()`  
+这是CUDA中最常见的块内同步原语。
+
+- 它是什么？ 一个执行屏障。它要求同一个线程块中的所有线程都必须执行到这个点，才能有任何线程继续执行后面的指令。
+
+- 它的作用： 它同步的是线程的执行流。它确保了一个线程块中的所有线程在代码中的某个特定点“碰头”。
+
+- 它不保证什么？ 仅仅使用 __syncthreads() 并不自动保证一个线程在屏障之前写入的内存（尤其是共享内存）结果，能够被屏障之后的其他线程看到。虽然在实际的CUDA实现中，为了简化编程模型，__syncthreads() 确实包含了一个强大的内存栅栏（如下文所述），但理解其双重角色很重要。
+
+简单比喻： 就像一场团队登山。__syncthreads() 是要求所有队员在半山腰的一个营地集合。在所有队员到达营地之前，任何人都不能继续向上爬。这确保了大家的进度是同步的。
+
+> __syncthreads() 实际上不仅仅是一个执行障碍，它还隐含了一个非常强大的 __threadfence_block() 操作。
+>
+> 这意味着：
+>
+> 执行同步：所有线程在此点汇合。  
+> 内存同步：它确保线程块内所有线程在 __syncthreads() 之前完成的所有内存操作（写入），对于所有其他线程在 __syncthreads() 之后的操作都是可见的。  
+>这就是“对同步前的内存操作可见度不同”的作用所在！
+
+正是因为 __syncthreads() 提供了这个强大的内存栅栏，我们才能安全地用它来协调线程间的数据交换。  
+
+2.  **内存栅栏：**  
+```
+ __threadfence(),
+ __threadfence_block(), 
+ __threadfence_system()
+```
+内存栅栏不同，它同步的是**内存操作（读/写）**的可见性，而不是线程的执行流。
+
+- 它是什么？ 一个内存排序操作。它确保在栅栏指令之前发出的所有内存写入（到全局内存、共享内存甚至本地内存，取决于栅栏的强度）对该栅栏之后发出的操作是可见的。
+
+- 它的作用： 它建立一个“围栏”，防止栅栏后的内存操作（读或写）被GPU或内存系统的硬件优化（如乱序执行、写缓冲）重排到栅栏之前。它不阻止线程继续执行，它只是给内存操作排好队。
+
+类型：
+
+- __threadfence_block(): 确保该线程在栅栏前的内存操作对同一线程块内的其他线程可见。
+
+- __threadfence(): 强度更高。确保对同一GPU上所有线程块的其他线程可见。（常用于全局内存的原子操作前后）
+
+- __threadfence_system(): 强度最高。确保对整个系统（包括CPU和其他GPU） 都可见。（用于多GPU或与CPU协作）
+
+简单比喻： 继续用登山比喻。内存栅栏就像是让一个队员（线程）在营地（同步点）大声喊出他的发现（写入数据），并确保他的喊声已经传播出去并被记录在案（数据可见），然后大家再继续行动。他不需要等其他队员，但他需要确保信息已经传达。 
+> 注意！ `__synthreads()`不能滥用，不注意的话很可能造成内核死锁，比如下面这种情况：
+```
+if (threadID % 2 == 0)
+{
+  __synthreads();
+} else {
+  __synthreads();
+}
+```
 
 ## 内存管理
 
@@ -172,7 +224,7 @@ kernel<<<grid,block,isize*sizeof(int)>>>(...);
 isize就是共享内存要存储的数组的大小。比如一个十个元素的int数组，isize就是10.
 注意，动态声明只支持一维数组。
 
-## 共享内存存储体
+### 共享内存存储体
 存储体是共享内存的硬件实现形式，每个共享内存单元包含32个存储体，对应wrap的32个线程，可以同时访问。当每个线程访问不同的存储体时，只要一个事务就能完成；但如果出现访问冲突，就需要多个事务。  
 
 并不是多个线程对同一个存储体访问就一定会出现访问冲突，因为存在多个线程访问一个地址的可能。如果多个线程访问同一存储体的同一地址（同一数据）会进行广播机制，即单一线程得到数据后向其他线程广播数据。这种读取方法延迟低但是利用率也低。  
@@ -187,7 +239,146 @@ cudaSharedMemBankSizeDefault
 cudaSharedMemBankSizeFourByte
 cudaSharedMemBankSizeEightByte
 ```
+### 共享内存使用
+共享内存可以在核函数声明，也可以在主机端声明，可以动态或静态声明。
+1. **核函数内动态声明**  
+  核函数内声明如下：
+  ```cpp
+  __global__ void func(){
+    extern __shared__ int list[];
+  }
+  ```
+  这种动态声明需要extern表示这个共享内存是运行时才知道的。调用时通过如下方式：
+  ```cpp
+  func<<<grid,block,(SIZEOFLIST)*sizeof(int)>>>();
+  ```
+  第三个参数就是共享内存的大小
 
+### 访问优化方法
+**填充**，在声明共享内存时声明额外的填充量，如
+```cpp
+__shared__ int mem[BDIMY][BDIMX+IPAD];
+```
+通过添加pad使共享内存中的有效行数据产生交叉，这样在列读取时不会出现多线程访问同一存储体的情况。
+
+## 常量内存
+常量内存存储在DRAM上，在SM上有64K的缓存。  
+常量内存对内核是**只读**的，主机端可读写。  
+常量内存在线程访问同一地址时有广播机制，访问不同地址时进行串行读取，会大大降低访问效率。
+### 常量内存使用方法
+常量内存用前缀`__constant`在程序头声明，常量内存变量的生命周期与程序周期相同。
+常量内存在主机端通过`cudaMemcpyToSymbol()`进行赋值。  
+
+## 线程洗牌指令
+线程洗牌是同一线程束的线程直接进行通信的一种方式，可以传递int或float变量。
+基本线程洗牌(shuffle)指令函数为
+```cpp
+int __shfl(int var, int srcLane, int width=warpSize)
+```
+var 为固定的变量名，srcLane为用width分割线程束得到的段的偏置，如srcLane=2，width=16时，0~15的线程得到2的var值，16~31的线程得到18的值。返回值就是目标线程的var变量的值。
+
+进阶的洗牌指令有`__shfl_up(), __shfl_down(), __shfl_xor()`,具体见[链接](https://face2ai.com/CUDA-F-5-6-%E7%BA%BF%E7%A8%8B%E6%9D%9F%E6%B4%97%E7%89%8C%E6%8C%87%E4%BB%A4/#:~:text=laneID%E9%83%BD%E6%98%AF1-,%E7%BA%BF%E7%A8%8B%E6%9D%9F%E6%B4%97%E7%89%8C%E6%8C%87%E4%BB%A4%E7%9A%84%E4%B8%8D%E5%90%8C%E5%BD%A2%E5%BC%8F,-%E7%BA%BF%E7%A8%8B%E6%9D%9F)  
+
+
+## CUDA流和并发
+
+流是CUDA支持并发的重要功能，多个流在GPU上并行执行可以有效覆盖GPU数据传输时的空闲时间，隐藏传输时延。  
+流声明如下：
+```cpp
+cudaStream_t streamName;
+```
+流需要在主机端进行初始化，如下：
+```cpp
+cudaError_t cudaStreamCreate(cudaStream_t *pStream);   //对流进行初始化
+cudaError_t cudaMemcpyAsync(void* dst, const void* src, size_t count, cudaMemcpyKind kind, cudaStream_t stream=0);  //异步传输数据
+```
+在流中引入内核函数时需要指定引入的流，如下：
+```cpp
+cudaKernalFunc<<<grid, block, shareMemSize, streamName>>>(arguments);
+```
+> <b style="color:pink;">注意，使用异步数据传输时，主机端的内存必须是固定的，而非分页的。</b>  
+> 因为主机端和设备端互不知道对方的逻辑内存，在异步执行时会指向固定的物理地址，如果主机端在期间对物理地址进行了重新分配，会导致未定义错误。  
+> 分配固定内存（页锁定内存）使用如下方法：
+>```cpp
+>cudaError_t cudaMallocHost(void** ptr, size_t size);
+>cudaError_t cudaHostAlloc(void** ptr, size_t size, unsigned int flags);
+>```
+> 当`cudaHostAlloc`的flags使用`cudaHostAllocDefault`默认值时和`cudaMallocHost()`完全等价。除默认值之外还能取如下值。
+> 
+>|flags | 含义 | 
+>|--|---|
+>cudaHostAllocPortable| 分配的内存可被所有 CUDA 上下文访问（默认仅当前上下文可访问）。
+>cudaHostAllocMapped | 分配的内存同时在设备端映射（可通过 cudaHostGetDevicePointer 获取设备指针直接访问，无需显式 cudaMemcpy）。
+>cudaHostAllocWriteCombined | 分配写合并内存（Write-Combined Memory），牺牲主机端读取性能，提升设备端读取速度（适合主机到设备的单向数据传输）。|
+>
+> 固定内存的释放要通过`cudaFreeHost()`进行，不能使用`free()`。
+
+内核的最大并发数量根据设备计算能力不同有不同的极限。
+
+## 流调度
+在多队列（如Hyper-Q）中可以同时执行多个流，这样减少了单队列时虚假依赖问题（可见[链接](https://face2ai.com/CUDA-F-6-1-%E6%B5%81%E5%92%8C%E4%BA%8B%E4%BB%B6%E6%A6%82%E8%BF%B0/#:~:text=%E5%B9%B6%E5%8F%91%E7%9A%84%E5%85%B3%E9%94%AE-,%E8%99%9A%E5%81%87%E7%9A%84%E4%BE%9D%E8%B5%96%E5%85%B3%E7%B3%BB,-%E5%9C%A8Fermi%E6%9E%B6%E6%9E%84)）。  
+在多队列中有些设备支持对流分配优先级，高优先级任务可以抢占低优先级任务资源。优先级流初始化如下:
+```cpp
+cudaError_t cudaStreamCreateWithPriority(cudaStream *pstream, unsigned int flags, int priority);
+```
+优先级越高，priority离0越远。
+
+## cuda事件
+
+cuda事件是一种用来对流中执行节点进行标记是工具，能够用来记录事件之间的时间间隔或实现流之间的同步控制。  
+事件的声明和初始化、调用方法如下：
+```cpp
+cudaEvent_t start,stop;                     //声明
+cudaCreateEvent(&start);
+cudaCreateEvent(&stop);                     //事件初始化
+
+cudaStream_t stream;                        //流声明和初始化
+cudaStreamCreate((cudaStream_t*)&stream);
+
+cudaEventRecord(start,stream);              //事件记录和绑定到流，stream参数默认为0
+kernel<<<grid,block,0,stream>>>();
+cudaEventRecord(stop,stream);
+
+cudaEventSynchronize(stop);                 //等待stop事件触发
+
+float time;
+cudaEventElapesdTime(&time,start,stop);     //记录事件间隔
+
+cudaEventDestroy(start);                    //回收事件资源
+cudaEventDestroy(stop);
+
+cudaStreamDestroy(stream);
+```
+
+## 流同步
+
+流被显示定义时为<b style="color:pink">非空流</b>，没有定义为<b style="color:pink;">空流</b>。空流都是阻塞的，非空流可以通过：
+```cpp
+cudaError_t cudaStreamCreateWithFlags(cudaStream_t* pStream, unsigned int flags);
+```
+来决定是阻塞的还是非阻塞的，阻塞则为默认`flags=cudaStreamDefault`，非阻塞则`flags=cudaStreamNonBlocking`。
+阻塞的流在主机端执行时是非并行的，只有在上一个阻塞流将控制权返回主机端后，下一个阻塞流才会启动。非阻塞流不会被阻塞流阻塞。  
+
+事件提供了一个跨流同步的方式：
+```cpp
+cudaError_t cudaStreamWaitEvent(cudaStream_t stream, cudatEvent_t event);
+```
+指定的流要等待指定的事件，事件完成后流才能继续，事件可以在这个流中，也可以不在。当在不同的流的时候，就实现了跨流同步。  
+CDUA提供了一种控制事件行为和性能的函数：
+```cpp
+cudaError_t cudaEventCreateWithFlags(cudaEvent_t* event, unsigned int flags);
+```
+其中参数是：
+```
+cudaEventDefault
+cudaEventBlockingSync
+cudaEventDisableTiming
+cudaEventInterprocess
+```
+- `cudaEventBlockingSync`指定使用`cudaEventSynchronize`同步会造成阻塞调用线程。`cudaEventSynchronize`默认是使用cpu周期不断重复查询事件状态  
+- `cudaEventBlockingSync`，会将查询放在另一个线程中，而原始线程继续执行，直到事件满足条件，才会通知原始线程，这样可以减少CPU的浪费，但是由于通讯的时间，会造成一定的延迟。  
+- `cudaEventDisableTiming`表示事件不用于计时，可以减少系统不必要的开支也能提升cudaStreamWaitEvent和cudaEventQuery的效率  
+- `cudaEventInterprocess`表明可能被用于进程之间的事件
 ## 性能评估
 
 ### 时间性能
