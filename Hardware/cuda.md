@@ -379,6 +379,35 @@ cudaEventInterprocess
 - `cudaEventBlockingSync`，会将查询放在另一个线程中，而原始线程继续执行，直到事件满足条件，才会通知原始线程，这样可以减少CPU的浪费，但是由于通讯的时间，会造成一定的延迟。  
 - `cudaEventDisableTiming`表示事件不用于计时，可以减少系统不必要的开支也能提升cudaStreamWaitEvent和cudaEventQuery的效率  
 - `cudaEventInterprocess`表明可能被用于进程之间的事件
+
+### CPU 和 GPU 并行
+在非阻塞的流运行中，CPU可以同步进行计算。
+```cpp
+cudaEvent_t start,stop;
+cudaEventCreate(&start);
+cudaEventCreate(&stop);
+cudaEventRecord(start,0);
+for(int i=0;i<N_SEGMENT;i++)
+{
+    int ioffset=i*iElem;
+    CHECK(cudaMemcpyAsync(&a_d[ioffset],&a_h[ioffset],nByte/N_SEGMENT,cudaMemcpyHostToDevice,stream[i]));
+    CHECK(cudaMemcpyAsync(&b_d[ioffset],&b_h[ioffset],nByte/N_SEGMENT,cudaMemcpyHostToDevice,stream[i]));
+    sumArraysGPU<<<grid,block,0,stream[i]>>>(&a_d[ioffset],&b_d[ioffset],&res_d[ioffset],iElem);
+    CHECK(cudaMemcpyAsync(&res_from_gpu_h[ioffset],&res_d[ioffset],nByte/N_SEGMENT,cudaMemcpyDeviceToHost,stream[i]));
+}
+//timer
+CHECK(cudaEventRecord(stop, 0));
+int counter=0;
+while (cudaEventQuery(stop)==cudaErrorNotReady)
+{
+    counter++;
+}
+printf("cpu counter:%d\n",counter);
+```
+`cudaEventRecord(stop)`是非阻塞的，cpu可以一直运行。
+
+### 流回调
+
 ## 性能评估
 
 ### 时间性能
