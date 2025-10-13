@@ -94,5 +94,17 @@
                 "url":"https://raw.githubusercontent.com/Afools/pictureRepo/main/DeepLearning/activative_function.md"
             }
         ]
+    },
+    {
+        "noteBook":"GPU CUDA",
+        "eventKey":6,
+        "notes":[
+            {
+                "title":"CUDA Basic",
+                "description":"",
+                "date":"2025-09-10",
+                "url":"https://raw.githubusercontent.com/Afools/pictureRepo/main/Hardware/cuda.md"
+            }
+        ]
     }
 ]

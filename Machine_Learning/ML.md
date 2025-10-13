@@ -1,5 +1,17 @@
 # Machine Learning 技术学习笔记
 
+
+## Cluster 聚簇
+### 重要概念
+- similarity/
+ 
+### K-mean 算法
+基本算法k-mean。 随机初始中心点并不断用平均聚簇点来迭代
+k-mean++ 通过尽可能增加初始中心点直接的距离来避免初始化不均匀造成效果下降。
+
+### hierarchical cluster
+自底向上或自顶向下的合并、拆分聚簇
+
 ## Classifier
 
 ### Gradient - Boosting Decision Tree 梯度提升决策树
