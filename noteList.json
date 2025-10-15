@@ -86,6 +86,12 @@
                 "description":"Note for Deep Learning",
                 "data":"2025-2-15",
                 "url":"https://raw.githubusercontent.com/Afools/pictureRepo/main/DeepLearning/DL.md"
+            },
+            {
+                "title":"激活函数和权重初始化",
+                "description":"激活函数和权重初始化学习笔记",
+                "data":"2025-4-19",
+                "url":"https://raw.githubusercontent.com/Afools/pictureRepo/main/DeepLearning/activative_function.md"
             }
         ]
     },

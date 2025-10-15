@@ -1,4 +1,16 @@
-# Deep Learning
+# 模型训练、构造技巧
+
+## 实用技巧
+
+带 batch 的矩阵乘法
+
+```python
+batch_size = 4
+embedding_dim = 8
+e1=torch.randn(batch_size, embedding_dim)
+e2=torch.randn(batch_size, embedding_dim)
+m=torch.sum(torch.mul(e1, e2), dim=1)  # 计算每个batch的内积
+```
 
 ## 实用库
 
